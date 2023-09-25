@@ -576,6 +576,202 @@ var _ = Describe("AMS Client", func() {
 				Expect(subs).ToNot(BeNil())
 			})
 		})
+
+		When("only account username is included", func() {
+			It("appends account username to ams query", func() {
+				client, err := NewClient(false)
+				Expect(err).To(BeNil())
+
+				returnedSubs :=`{"items":[{"id": "subId"}]}`
+				
+				amsServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/api/accounts_mgmt/v1/subscriptions"),
+						http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							params, err := url.ParseQuery(r.URL.RawQuery)
+							
+							Expect(err).ToNot(HaveOccurred(), "query should be constructed with valid params")
+							Expect(params.Has("search")).To(BeTrue(), "params should have search")
+							
+							search := params.Get("search")
+							Expect(search).To(BeEquivalentTo("plan.id LIKE 'AnsibleWisdom' AND organization_id = 'amsOrgId' AND creator.username = 'username'"))
+						}),
+						ghttp.RespondWith(http.StatusOK, returnedSubs, http.Header{"Content-Type": {"application/json"}}),
+					),
+				)
+
+				username := "username"
+				params := api.GetSeatsParams{
+					AccountUsername: &username,
+				}
+
+				subs, err := client.GetSubscriptions("orgId", params, 1, 0)
+
+				Expect(err).To(BeNil())
+				Expect(subs).ToNot(BeNil())
+			})
+		})
+
+		When("only email is included", func() {
+			It("appends email to ams query", func() {
+				client, err := NewClient(false)
+				Expect(err).To(BeNil())
+
+				returnedSubs :=`{"items":[{"id": "subId"}]}`
+				
+				amsServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/api/accounts_mgmt/v1/subscriptions"),
+						http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							params, err := url.ParseQuery(r.URL.RawQuery)
+							
+							Expect(err).ToNot(HaveOccurred(), "query should be constructed with valid params")
+							Expect(params.Has("search")).To(BeTrue(), "params should have search")
+							
+							search := params.Get("search")
+							Expect(search).To(BeEquivalentTo("plan.id LIKE 'AnsibleWisdom' AND organization_id = 'amsOrgId' AND creator.email = 'email'"))
+						}),
+						ghttp.RespondWith(http.StatusOK, returnedSubs, http.Header{"Content-Type": {"application/json"}}),
+					),
+				)
+
+				email := "email"
+				params := api.GetSeatsParams{
+					Email: &email,
+				}
+
+				subs, err := client.GetSubscriptions("orgId", params, 1, 0)
+
+				Expect(err).To(BeNil())
+				Expect(subs).ToNot(BeNil())
+			})
+		})
+
+		When("only first name is included", func() {
+			It("appends first name to ams query", func() {
+				client, err := NewClient(false)
+				Expect(err).To(BeNil())
+
+				returnedSubs :=`{"items":[{"id": "subId"}]}`
+				
+				amsServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/api/accounts_mgmt/v1/subscriptions"),
+						http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							params, err := url.ParseQuery(r.URL.RawQuery)
+							
+							Expect(err).ToNot(HaveOccurred(), "query should be constructed with valid params")
+							Expect(params.Has("search")).To(BeTrue(), "params should have search")
+							
+							search := params.Get("search")
+							Expect(search).To(BeEquivalentTo("plan.id LIKE 'AnsibleWisdom' AND organization_id = 'amsOrgId' AND creator.first_name = 'foo'"))
+						}),
+						ghttp.RespondWith(http.StatusOK, returnedSubs, http.Header{"Content-Type": {"application/json"}}),
+					),
+				)
+
+				fname := "foo"
+				params := api.GetSeatsParams{
+					FirstName: &fname,
+				}
+
+				subs, err := client.GetSubscriptions("orgId", params, 1, 0)
+
+				Expect(err).To(BeNil())
+				Expect(subs).ToNot(BeNil())
+			})
+		})
+
+		When("only last name is included", func() {
+			It("appends last name to ams query", func() {
+				client, err := NewClient(false)
+				Expect(err).To(BeNil())
+
+				returnedSubs :=`{"items":[{"id": "subId"}]}`
+				
+				amsServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/api/accounts_mgmt/v1/subscriptions"),
+						http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							params, err := url.ParseQuery(r.URL.RawQuery)
+							
+							Expect(err).ToNot(HaveOccurred(), "query should be constructed with valid params")
+							Expect(params.Has("search")).To(BeTrue(), "params should have search")
+							
+							search := params.Get("search")
+							Expect(search).To(BeEquivalentTo("plan.id LIKE 'AnsibleWisdom' AND organization_id = 'amsOrgId' AND creator.last_name = 'bar'"))
+						}),
+						ghttp.RespondWith(http.StatusOK, returnedSubs, http.Header{"Content-Type": {"application/json"}}),
+					),
+				)
+
+				lname := "bar"
+				params := api.GetSeatsParams{
+					LastName: &lname,
+				}
+
+				subs, err := client.GetSubscriptions("orgId", params, 1, 0)
+
+				Expect(err).To(BeNil())
+				Expect(subs).ToNot(BeNil())
+			})
+		})
+
+		When("all search params are used", func() {
+			It("should construct the query correctly", func() {
+				returnedSubs :=`{"items":[{"id": "subId", "status": "active"}]}`
+				
+				amsServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", ContainSubstring("/api/accounts_mgmt/v1/subscriptions")),
+						http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							params, err := url.ParseQuery(r.URL.RawQuery)
+							
+							Expect(err).ToNot(HaveOccurred(), "query should be constructed with valid params")
+							Expect(params).To(HaveLen(4))
+							Expect(params.Has("search")).To(BeTrue(), "params should have search")
+							Expect(params.Has("fetchAccounts")).To(BeTrue(), "params should have fetchAccounts")
+							Expect(params.Has("size")).To(BeTrue(), "params should have size")
+							Expect(params.Has("page")).To(BeTrue(), "params should have page")
+	
+							Expect(params.Get("search")).To(BeEquivalentTo(
+								"plan.id LIKE 'AnsibleWisdom' AND organization_id = 'amsOrgId' " + 
+								"AND status IN ('Active','Deprovisioned') " +
+								"AND creator.username = 'foobar' " +
+								"AND creator.email = 'foobar@redhat.com' " + 
+								"AND creator.first_name = 'foo' " + 
+								"AND creator.last_name = 'bar'",
+							))
+							Expect(params.Get("fetchAccounts")).To(BeEquivalentTo("true"))
+							Expect(params.Get("size")).To(BeEquivalentTo("2"))
+							Expect(params.Get("page")).To(BeEquivalentTo("1"))
+						}),
+						ghttp.RespondWith(http.StatusOK, returnedSubs, http.Header{"Content-Type": {"application/json"}}),
+					),
+				)
+	
+				client, err := NewClient(false)
+				Expect(err).To(BeNil())
+				
+				username 	:= "foobar"
+				email 		:= "foobar@redhat.com"
+				fname 		:= "foo"
+				lname 		:= "bar"
+
+				params := api.GetSeatsParams{
+					Status: &api.Status{string(api.Active), string(api.Deprovisioned)},
+					AccountUsername: &username,
+					Email: &email,
+					FirstName: &fname,
+					LastName: &lname,
+				}
+				
+				subs, err := client.GetSubscriptions("orgId", params, 2, 1)
+	
+				Expect(err).To(BeNil())
+				Expect(subs).ToNot(BeNil())
+			})
+		})
 	})
 
 	Context("ConvertUserOrgId", func() {

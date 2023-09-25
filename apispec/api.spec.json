@@ -432,6 +432,32 @@
                     "SeatsSortOrderDESC"
                 ]
             },
+            "SeatsSort": {
+                "type": "string",
+                "enum": [
+                    "account_username",
+                    "first_name",
+                    "last_name",
+                    "email"
+                ],
+                "x-enum-varnames": [
+                    "SeatsSortUSERNAME",
+                    "SeatsSortFIRSTNAME",
+                    "SeatsSortLASTNAME",
+                    "SeatsSortEMAIL"
+                ]
+            },
+            "SeatsSortOrder": {
+                "type": "string",
+                "enum": [
+                    "asc",
+                    "desc"
+                ],
+                "x-enum-varnames": [
+                    "SeatsSortOrderASC",
+                    "SeatsSortOrderDESC"
+                ]
+            },
             "ServiceDetails": {
                 "type": "object",
                 "properties": {
@@ -585,6 +611,9 @@
                         "type": "string"
                     },
                     "last_name": {
+                        "type": "string"
+                    },
+                    "email": {
                         "type": "string"
                     },
                     "email": {
